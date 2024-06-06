@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 
 import { Logo } from "@/components/logo";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 
 export const Navbar = () => {
   return (
@@ -13,7 +14,7 @@ export const Navbar = () => {
     >
       <Logo />
       <div className="flex w-full items-center justify-between gap-x-2 md:ml-auto md:justify-end">
-        {/* TODO: toggle mode */}
+        <ModeToggle />
       </div>
     </div>
   );
