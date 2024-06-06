@@ -1,7 +1,10 @@
-import { getUserByEmail } from "@/lib/actions/user";
-import { db } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
+
+import { getUserByEmail } from "@/data/user";
+import { db } from "@/lib/db";
+import { sendVerificationEmail } from "@/lib/mail";
+import { generateVerificationToken } from "@/lib/tokens";
 
 export async function GET(req: NextRequest) {}
 
@@ -29,8 +32,13 @@ export async function POST(req: NextRequest) {
     });
 
     // TODO: Send verification token email
+    const verificationToken = await generateVerificationToken(email);
+    await sendVerificationEmail(email, verificationToken.token);
 
-    return NextResponse.json({ success: "Email sent!" }, { status: 200 });
+    return NextResponse.json(
+      { success: "Confirmation email sent!" },
+      { status: 200 },
+    );
   } catch (error) {
     return NextResponse.json(
       { error: "Internal server error" },
