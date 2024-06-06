@@ -11,6 +11,7 @@ import { LoginSchema } from "@/lib/schemas";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { FormError } from "@/components/auth/form-error";
+import { FormSuccess } from "@/components/auth/form-success";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -28,6 +29,7 @@ export const LoginForm = () => {
     searchParams.get("error") === "OAuthAccountNotLinked"
       ? "Email is already in use with differrent provider"
       : "";
+  const [success, setSuccess] = useState<string | undefined>("");
   const [error, setError] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
@@ -41,9 +43,12 @@ export const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
+    setSuccess("");
+
     startTransition(() => {
       login(values).then((data) => {
         setError(data?.error);
+        setSuccess(data?.success);
       });
     });
   };
@@ -95,6 +100,7 @@ export const LoginForm = () => {
             />
           </div>
           <FormError message={error || urlError} />
+          <FormSuccess message={success} />
           <Button type="submit" disabled={isPending} className="w-full">
             Login
           </Button>
