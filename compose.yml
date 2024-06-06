@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=iyesss
+      - POSTGRES_PASSWORD=aldiyes17032002
+      - POSTGRES_DB=next_todos_pgdb
+    ports:
+      - 5432:5432
