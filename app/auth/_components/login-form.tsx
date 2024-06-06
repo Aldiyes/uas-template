@@ -7,6 +7,8 @@ import * as z from 'zod';
 import { LoginSchema } from '@/lib/schemas';
 
 import { CardWrapper } from '@/components/auth/card-wrapper';
+import { FormError } from '@/components/auth/form-error';
+import { FormSuccess } from '@/components/auth/form-success';
 import { Button } from '@/components/ui/button';
 import {
 	Form,
@@ -72,6 +74,8 @@ export const LoginForm = () => {
 							)}
 						/>
 					</div>
+					<FormError message={''} />
+					<FormSuccess message={''} />
 					<Button type="submit" className="w-full">
 						Login
 					</Button>
