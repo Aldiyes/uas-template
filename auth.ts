@@ -2,9 +2,39 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import NextAuth from "next-auth";
 
 import authConfig from "@/auth.config";
+import { getUserById } from "@/lib/actions/user";
 import { db } from "@/lib/db";
 
-export const { auth, handlers, signIn, signOut } = NextAuth({
+export const {
+  handlers: { GET, POST },
+  auth,
+  signIn,
+  signOut,
+} = NextAuth({
+  callbacks: {
+    async session({ token, session }) {
+      if (token.sub && session.user) {
+        session.user.id = token.sub;
+      }
+
+      if (token.role && session.user) {
+        session.user.role = token.role;
+      }
+
+      return session;
+    },
+    async jwt({ token }) {
+      if (!token.sub) return token;
+
+      const userExists = await getUserById(token.sub);
+
+      if (!userExists) return token;
+
+      token.role = userExists.role;
+
+      return token;
+    },
+  },
   adapter: PrismaAdapter(db),
   session: { strategy: "jwt" },
   ...authConfig,

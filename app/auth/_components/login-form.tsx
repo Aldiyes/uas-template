@@ -9,7 +9,6 @@ import { LoginSchema } from "@/lib/schemas";
 
 import { CardWrapper } from "@/components/auth/card-wrapper";
 import { FormError } from "@/components/auth/form-error";
-import { FormSuccess } from "@/components/auth/form-success";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -24,7 +23,6 @@ import { login } from "@/lib/actions/auth-action";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
-  const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof LoginSchema>>({
@@ -37,11 +35,9 @@ export const LoginForm = () => {
 
   const onSubmit = (values: z.infer<typeof LoginSchema>) => {
     setError("");
-    setSuccess("");
     startTransition(() => {
       login(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        setError(data?.error);
       });
     });
   };
@@ -93,7 +89,6 @@ export const LoginForm = () => {
             />
           </div>
           <FormError message={error} />
-          <FormSuccess message={success} />
           <Button type="submit" disabled={isPending} className="w-full">
             Login
           </Button>
