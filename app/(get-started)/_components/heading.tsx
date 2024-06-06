@@ -2,6 +2,7 @@
 
 import { MdKeyboardDoubleArrowRight } from "react-icons/md";
 
+import { LoginButton } from "@/components/auth/login-button";
 import { Button } from "@/components/ui/button";
 
 export const Heading = () => {
@@ -14,10 +15,14 @@ export const Heading = () => {
       <h3 className="font text-base font-medium sm:text-xl md:text-2xl">
         NextTodos help you develop positive habits and achieve goals
       </h3>
-      <Button>
-        Enter NextTodos
-        <MdKeyboardDoubleArrowRight className="ml-2 h-4 w-4" />
-      </Button>
+      <div>
+        <LoginButton>
+          <Button>
+            Enter NextTodos
+            <MdKeyboardDoubleArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </LoginButton>
+      </div>
     </div>
   );
 };
