@@ -33,8 +33,14 @@ model User {
   email         String?   @unique
   password      String?
   emailVerified DateTime? @map("email_verified")
+  role          UserRole  @default(USER)
   image         String?
   accounts      Account[]
 
   @@map("users")
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }

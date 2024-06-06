@@ -20,7 +20,9 @@ export default auth((req) => {
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-  if (isApiAuthRoute) return NextResponse.next();
+  if (isApiAuthRoute) {
+    return NextResponse.next();
+  }
 
   if (isAuthRoute) {
     if (isLoggedIn) {
@@ -32,10 +34,10 @@ export default auth((req) => {
   if (!isLoggedIn && !isPublicRoute) {
     return NextResponse.redirect(new URL("/auth/login", nextUrl));
   }
+
   return NextResponse.next();
 });
 
-// Optionally, don't invoke Middleware on some paths
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
 };
