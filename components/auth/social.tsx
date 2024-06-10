@@ -12,22 +12,28 @@ export const Social = () => {
     });
   };
   return (
-    <div className="flex w-full items-center gap-x-2">
+    <div className="flex w-full flex-col items-center gap-y-4">
       <Button
         size="lg"
         className="w-full"
         variant="outline"
         onClick={() => onLogin("google")}
       >
-        <FcGoogle className="h-5 w-5" />
+        <span>Login with</span>
+        <FcGoogle className="ml-2 h-5 w-5" />
       </Button>
+      <div className="relative flex w-full items-center justify-center">
+        <h1 className="z-10 bg-neutral-100 px-4 dark:bg-neutral-900">OR</h1>
+        <div className="absolute w-full border-2 border-b dark:border-white" />
+      </div>
       <Button
         size="lg"
         className="w-full"
         variant="outline"
         onClick={() => onLogin("github")}
       >
-        <FaGithub className="h-5 w-5" />
+        <span>Login with</span>
+        <FaGithub className="ml-2 h-5 w-5" />
       </Button>
     </div>
   );
