@@ -13,7 +13,7 @@ export const Logo = () => {
         height="20"
         width="20"
         alt="Logo"
-        className="dark:hidden"
+        className="h-auto dark:hidden"
         priority
       />
       <Image
@@ -21,7 +21,7 @@ export const Logo = () => {
         height="20"
         width="20"
         alt="Logo"
-        className="hidden dark:block"
+        className="hidden h-auto dark:block"
         priority
       />
       <p className={cn("font-semibold", poppins.className)}>NextTodos</p>

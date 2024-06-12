@@ -1,26 +1,33 @@
-import NextAuth from "next-auth";
+import { cookies } from "next/headers";
+import { NextResponse, type NextRequest } from "next/server";
 
-import authConfig from "@/auth.config";
-
+import { getToken } from "@/lib/actions/auth-actions";
 import {
   DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
   authRoutes,
   publicRoutes,
 } from "@/routes";
-import { NextResponse } from "next/server";
 
-const { auth } = NextAuth(authConfig);
+const API_URL = process.env.API_URL;
 
-export default auth((req) => {
+export async function middleware(req: NextRequest) {
   const { nextUrl } = req;
-  const isLoggedIn = !!req.auth;
+  const currentUser = await getToken();
+
+  const res = await fetch(`${API_URL}/user`, {
+    headers: {
+      Authorization: `Bearer ${currentUser}`,
+    },
+  });
+
+  const isLoggedIn = (await res.status) == 200;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
   const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
-  if (isApiAuthRoute) {
+  if (isApiAuthRoute || isPublicRoute) {
     return NextResponse.next();
   }
 
@@ -35,8 +42,17 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/login", nextUrl));
   }
 
+  if (!res.ok) {
+    cookies()
+      .getAll()
+      .forEach((cookie) => {
+        cookies().delete(cookie.name);
+      });
+    return NextResponse.redirect(new URL("/auth/login", nextUrl));
+  }
+
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/((?!.+\\.[\\w]+$|_next).*)", "/", "/(api|trpc)(.*)"],
