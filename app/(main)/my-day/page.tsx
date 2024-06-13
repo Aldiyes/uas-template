@@ -1,7 +1,7 @@
-import { Button } from '@/components/ui/button';
-import { getUser } from '@/lib/actions/auth-actions';
 import Image from 'next/image';
-import { FiPlusCircle } from 'react-icons/fi';
+
+import { getUser } from '@/lib/actions/auth-actions';
+import { UserInfo } from '@/types';
 import { ButtonCreateProject } from './_components/button-create-project';
 
 export default async function MyDayPage() {

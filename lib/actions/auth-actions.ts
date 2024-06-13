@@ -1,87 +1,92 @@
-"use server";
-import { cookies } from "next/headers";
+'use server';
+import { cookies } from 'next/headers';
 
-import * as z from "zod";
+import * as z from 'zod';
 
-import { LoginSchema, RegisterSchema } from "@/lib/schemas";
-
-const API_URL = process.env.API_URL;
+import { API_URL, AUTH_TOKEN, SESSION_TOKEN } from '@/data/constants';
+import { decrypt, encrypt } from '@/lib/encryption';
+import { LoginSchema, RegisterSchema } from '@/lib/schemas';
 
 export const login = async (values: z.infer<typeof LoginSchema>) => {
-  const validatedFields = LoginSchema.safeParse(values);
+	const validatedFields = LoginSchema.safeParse(values);
 
-  if (!validatedFields.success) {
-    return { error: "Invalid fields!" };
-  }
+	if (!validatedFields.success) {
+		return { error: 'Invalid fields!' };
+	}
 
-  try {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: "POST",
-      body: JSON.stringify(validatedFields.data),
-    });
+	try {
+		const res = await fetch(`${API_URL}/auth/login`, {
+			method: 'POST',
+			body: JSON.stringify(validatedFields.data),
+		});
 
-    const response = await res.json();
-    console.log("[CLIENT > LOGIN_ACTION > RESPONSE] - ", response);
+		const response = await res.json();
 
-    if (response.token) {
-      console.log("[CLIENT > LOGIN_ACTION > TOKEN] - ", response.token);
-      cookies().set({
-        name: "auth.token",
-        value: response.token,
-        secure: true,
-        httpOnly: true,
-        path: "/",
-        sameSite: true,
-      });
-      console.log("[CLIENT > LOGIN_ACTION > USER] - ", response.user);
-      cookies().set({
-        name: "session.token",
-        value: JSON.stringify(response.user),
-        secure: true,
-      });
-    }
-    return response;
-  } catch (error) {
-    return { error: "Internal server error" };
-  }
+		if (response.token) {
+			cookies().set({
+				name: AUTH_TOKEN,
+				value: encrypt(response.token),
+				secure: true,
+				httpOnly: true,
+				path: '/',
+				sameSite: true,
+			});
+			cookies().set({
+				name: SESSION_TOKEN,
+				value: encrypt(JSON.stringify(response.user)),
+				secure: true,
+			});
+		}
+		return response;
+	} catch (error) {
+		return { error: 'Internal server error' };
+	}
 };
 
 export const register = async (values: z.infer<typeof RegisterSchema>) => {
-  const validatedFields = RegisterSchema.safeParse(values);
+	const validatedFields = RegisterSchema.safeParse(values);
 
-  if (!validatedFields.success) {
-    return { error: "Invalid fields!" };
-  }
+	if (!validatedFields.success) {
+		return { error: 'Invalid fields!' };
+	}
 
-  const res = await fetch(`${API_URL}/auth/register`, {
-    method: "POST",
-    body: JSON.stringify(validatedFields.data),
-    headers: {
-      "content-type": "application/json",
-    },
-  });
+	const res = await fetch(`${API_URL}/auth/register`, {
+		method: 'POST',
+		body: JSON.stringify(validatedFields.data),
+		headers: {
+			'content-type': 'application/json',
+		},
+	});
 
-  const response = await res.json();
-  console.log("[CLIENT > REGISTER_ACTION > RESPONSE] - ", response);
+	const response = await res.json();
+	console.log('[CLIENT > REGISTER_ACTION > RESPONSE] - ', response);
 
-  return response;
+	return response;
 };
 
 export const logout = async () => {
-  await removeToken();
+	await removeToken();
 };
 
-export const getUser = async () => {
-  const chipertext = cookies().get("session.token")?.value;
-  return chipertext ? JSON.parse(chipertext) : null;
-};
+export async function getUser() {
+	const chipertext = cookies().get(SESSION_TOKEN)?.value;
+	return chipertext ? JSON.parse(decrypt(chipertext)) : null;
+}
 
 export async function getToken() {
-  const chipertext = cookies().get("auth.token")?.value;
-  return chipertext ? chipertext : null;
+	const cookieStore = cookies();
+	const authToken = cookieStore.get(AUTH_TOKEN);
+
+	if (authToken) {
+		const decryptedToken = decrypt(authToken.value);
+		console.log('Token found and decrypted:', decryptedToken);
+		return decryptedToken;
+	}
+	console.error('No auth token found');
+	return null;
 }
 
 export const removeToken = async () => {
-  cookies().delete("session.token");
-  cookies().delete("auth.token");
+	cookies().delete(SESSION_TOKEN);
+	cookies().delete(AUTH_TOKEN);
 };

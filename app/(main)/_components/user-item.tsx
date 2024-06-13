@@ -31,6 +31,15 @@ export const UserItem = ({ user }: Props) => {
 						<Avatar className="h-5 w-5">
 							<AvatarImage
 								src={typeof user.image === 'string' ? user.image : './logo.svg'}
+								className="dark:hidden"
+							/>
+							<AvatarImage
+								src={
+									typeof user.image === 'string'
+										? user.image
+										: './logo-dark.svg'
+								}
+								className="hidden dark:block"
 							/>
 						</Avatar>
 						<span className="line-clamp-1 text-start font-medium">
@@ -57,6 +66,15 @@ export const UserItem = ({ user }: Props) => {
 									src={
 										typeof user.image === 'string' ? user.image : './logo.svg'
 									}
+									className="dark:hidden"
+								/>
+								<AvatarImage
+									src={
+										typeof user.image === 'string'
+											? user.image
+											: './logo-dark.svg'
+									}
+									className="hidden dark:block"
 								/>
 							</Avatar>
 						</div>
